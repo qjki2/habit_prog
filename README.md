@@ -1,4 +1,4 @@
-Docker 
+Come far partire l app con Docker 
 docker compose up -> avvio 
 docker compose build --no-cache -> per resartare la cache
 docker compose down 
