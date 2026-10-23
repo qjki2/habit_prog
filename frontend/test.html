@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Backend Habit Tracker</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+        .box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+        input, button { display: block; margin-bottom: 10px; width: 100%; padding: 8px; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <h2>Test API Backend</h2>
+
+    <!-- Form Registrazione Utente -->
+    <div class="box">
+        <h3>1. Registrazione Utente (POST /api/register)</h3>
+        <input type="text" id="username" placeholder="Username">
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password (min 6 car.)">
+        <button onclick="registerUser()">Invia Registrazione</button>
+    </div>
+
+    <!-- Pulsante Recupero Dati -->
+    <div class="box">
+        <h3>2. Lista Abitudini (GET /api/habits)</h3>
+        <button onclick="getHabits()">Carica Abitudini</button>
+    </div>
+
+    <!-- Output Risposte JSON -->
+    <h3>Risposta dal Server:</h3>
+    <pre id="output">Nessuna risposta inviata ancora...</pre>
+
+    <script>
+        const API_URL = "http://localhost:8000"; // Indirizzo del server Flask
+
+        // Funzione per testare la registazione (POST)
+        async function registerUser() {
+            const payload = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('output').innerText = "Errore di connessione: " + error;
+            }
+        }
+
+        // Funzione per testare il recupero dati (GET)
+        async function getHabits() {
+            try {
+                const response = await fetch(`${API_URL}/api/habits`);
+                const data = await response.json();
+                document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('output').innerText = "Errore di connessione: " + error;
+            }
+        }
+    </script>
+</body>
+</html>
