@@ -2,9 +2,7 @@ import os
 from flask import Flask
 from flask_cors import CORS
 from app.extensions import db, ma
-
-# IMPORTANTE: Importa i modelli affinché SQLAlchemy riconosca le classi
-from app.models.habit import User, Habit, SegueHabit, HabitLog
+from app.models.habit import User
 
 def create_app():
     app = Flask(__name__)
@@ -22,5 +20,11 @@ def create_app():
     with app.app_context():
         # Legge i modelli Python e invia i comandi SQL 'CREATE TABLE IF NOT EXISTS' a Postgres
         db.create_all()
+        if not User.query.first():
+            # Se non ci sono utenti, crea un utente di default
+            default_user = User(username="default_user", email = "admin@g.com")
+            default_user.set_password("admin123")
+            db.session.add(default_user)
+            db.session.commit()
 
     return app

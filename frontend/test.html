@@ -2,71 +2,77 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Test Backend Habit Tracker</title>
+    <title>Test Habit Tracker</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-        .box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-        input, button { display: block; margin-bottom: 10px; width: 100%; padding: 8px; }
-        pre { background: #f4f4f4; padding: 10px; border-radius: 5px; }
+        body { font-family: sans-serif; max-width: 450px; margin: 40px auto; }
+        input, button { display: block; width: 100%; margin: 8px 0; padding: 10px; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; }
+        ul { list-style: none; padding: 0; }
+        li { background: #eee; margin: 5px 0; padding: 10px; border-radius: 4px; }
     </style>
 </head>
 <body>
+    <h2>Test Habit Tracker</h2>
 
-    <h2>Test API Backend</h2>
-
-    <!-- Form Registrazione Utente -->
-    <div class="box">
-        <h3>1. Registrazione Utente (POST /api/register)</h3>
-        <input type="text" id="username" placeholder="Username">
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="password" placeholder="Password (min 6 car.)">
-        <button onclick="registerUser()">Invia Registrazione</button>
+    <div>
+        <input type="text" id="name" placeholder="Nome abitudine (es. Bere Acqua)" required>
+        <input type="text" id="description" placeholder="Descrizione">
+        <button onclick="createHabit()">Aggiungi Abitudine</button>
     </div>
 
-    <!-- Pulsante Recupero Dati -->
-    <div class="box">
-        <h3>2. Lista Abitudini (GET /api/habits)</h3>
-        <button onclick="getHabits()">Carica Abitudini</button>
-    </div>
-
-    <!-- Output Risposte JSON -->
-    <h3>Risposta dal Server:</h3>
-    <pre id="output">Nessuna risposta inviata ancora...</pre>
+    <h3>Abitudini Salvate:</h3>
+    <ul id="habit-list"></ul>
 
     <script>
-        const API_URL = "http://localhost:8000"; // Indirizzo del server Flask
+        const API_URL = "http://localhost:5001";
 
-        // Funzione per testare la registazione (POST)
-        async function registerUser() {
-            const payload = {
-                username: document.getElementById('username').value,
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value
-            };
+        async function createHabit() {
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+
+            if (!name) return alert("Inserisci un nome!");
 
             try {
-                const response = await fetch(`${API_URL}/api/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                const response = await fetch(`${API_URL}/habits`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: name, description: description })
                 });
-                const data = await response.json();
-                document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+
+                if (response.ok) {
+                    document.getElementById('name').value = '';
+                    document.getElementById('description').value = '';
+                    loadHabits();
+                } else {
+                    const err = await response.json();
+                    alert("Errore: " + (err.error || response.statusText));
+                }
             } catch (error) {
-                document.getElementById('output').innerText = "Errore di connessione: " + error;
+                console.error("Errore di connessione:", error);
+                alert("Impossibile connettersi al backend!");
             }
         }
 
-        // Funzione per testare il recupero dati (GET)
-        async function getHabits() {
+        async function loadHabits() {
             try {
-                const response = await fetch(`${API_URL}/api/habits`);
-                const data = await response.json();
-                document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+                const response = await fetch(`${API_URL}/habits`);
+                const habits = await response.json();
+                
+                const list = document.getElementById('habit-list');
+                list.innerHTML = '';
+                
+                habits.forEach(h => {
+                    const li = document.createElement('li');
+                    li.textContent = `📌 ${h.name} - ${h.description || 'Nessuna descrizione'}`;
+                    list.appendChild(li);
+                });
             } catch (error) {
-                document.getElementById('output').innerText = "Errore di connessione: " + error;
+                console.error("Errore nel caricamento:", error);
             }
         }
+
+        loadHabits();
     </script>
 </body>
 </html>
+
