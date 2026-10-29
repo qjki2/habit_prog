@@ -1,5 +1,1 @@
-Come far partire l app con Docker 
-docker compose up -> avvio 
-docker compose build --no-cache -> per resartare la cache
-docker compose down 
-docker compose down -v -> quando modifico la struttura dei modelli in models.py ricrea il db da 0 
+Progetto -> web app di gestione delle proprie abitudini in compagnia. 
